@@ -12,8 +12,9 @@ namespace Devoir2
         private int rows;
         private int cols;
 
-        public Matrix()
+        public Matrix(Matrix m)
         {
+
         }
 
         public Matrix(double[,] data)
@@ -27,7 +28,7 @@ namespace Devoir2
         {
             this.rows = rows;
             this.cols = cols;
-            this.data = new double[rows, cols];          
+            data = new double[rows, cols];          
         }
 
         public double[,] getData()
@@ -70,7 +71,7 @@ namespace Devoir2
 
         public Matrix multiply(Matrix p_matrix)
         {
-            if (cols != p_matrix.cols)
+            if (cols != p_matrix.rows)
             {
                 throw new InvalidOperationException ("Le nombre de colonnes de la première matrice doit etre égal au nombre de lignes de la deuxième matrice."); 
             }
@@ -88,6 +89,33 @@ namespace Devoir2
                 }
             }
             return rm;
+        }
+
+        public void fillMatrixWithData(int id)
+        {
+            Console.WriteLine("Insertion des données de la matrice "+id);
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    Console.Write(string.Format("Donnée [{0},{1}]", i, j));
+                    bool ok = false;
+
+                    do
+                    {
+                        try
+                        {
+                            double value = double.Parse(Console.ReadLine());
+                            data[i, j] = value;
+                            ok = true;
+                        }
+                        catch
+                        {
+                            throw new Exception("La donnée doit être un chiffre");
+                        }
+                    } while (!ok);
+                }
+            }
         }
 
         public Matrix scallarProduct(double p_nbr)
