@@ -14,10 +14,49 @@ namespace Devoir2
         static void Main(string[] args)
         {
 
+            Matrix m0 = new Matrix(new double[,]
+            {
+                    //pour tester parametre 0 ( triangulaire supérieure)
+                    /*
+                    {5, 0, 2},
+                    {0, -4, 4},
+                    {0, 0, 1}
+                    */
+                    /*
+                    {5, 0, 2},
+                    {1, -4, 4},
+                    {0, 0, 1}
+                    */
+                    /*
+                    {0, 0, 2},
+                    {0, 0, 4},
+                    {0, 0, 0}
+                    */
+
+                    //pour tester parametre 0 ( triangulaire inférieure)
+                    /*
+                    {5, 0, 0},
+                    {1, 4, 0},
+                    {4, 5, 1}
+                    */
+                    
+                   /* 
+                    {5, 0, 0},
+                    {1, -4, 4},
+                    {4, 5, 1}
+                    */
+
+                    
+                    {0, 0, 0},
+                    {5, 0, 0},
+                    {0, 9, 0}
+                    
+                    
+            });
 
 
-
-
+            //Console.WriteLine( "Est-elle triangulaire? : " + m0.isTriangular(0,true));
+            Console.WriteLine("Est-elle triangulaire? : " + m0.isTriangular(1, false));
 
 
             //Addition de matrices
@@ -73,7 +112,7 @@ namespace Devoir2
                 try
                 {
                     nbCol = int.Parse(Console.ReadLine());
-                    Console.Write("Nombre de rangée : ");
+                    Console.Write("Nombre de lignes : ");
                     nbRow = int.Parse(Console.ReadLine());
 
                     Matrix newMatrix = new Matrix(nbRow, nbCol);
@@ -152,14 +191,41 @@ namespace Devoir2
                             matrixes.Add(resultMatrix);
                             break;
                         case "3":
+                            //pour aller plus vite lors du test
+                            Matrix a1 = new Matrix(new double[,]
+                            {
+                            {1,2,3},
+                            {4,5,6}
+                            });
+
+                            Matrix a2 = new Matrix(new double[,]
+                            {
+                            {1,2,3},
+                            {4,5,6},
+                            {7,8,9}
+                            });
+
+                            Matrix a3 = new Matrix(new double[,]
+                            {
+                            {1,2},
+                            {3,4},
+                            {5,6}
+                            });
+
+                            matrixes.Add(a1);
+                            matrixes.Add(a2);
+                            matrixes.Add(a3);
+
+
                             operationMatrixes = AskForMatrixes(matrixes);
                             operationMatrix = new Matrix(operationMatrixes[0]);
                             operationMatrixes.RemoveAt(0);
-                            resultMatrix = operationMatrix.multiply(operationMatrixes);             // à Faire quand vincent est là
-                            resultMatrix.display();
-                            matrixes.Add(resultMatrix);
+                            //resultMatrix = operationMatrix.multiplyV2(operationMatrixes);             // à Faire quand vincent est là
+                            //resultMatrix.display();
+                            //matrixes.Add(resultMatrix);
                             break;
                         case "4":
+
                             break;
                         case "5":
                             break;
@@ -217,11 +283,12 @@ namespace Devoir2
         {
             List<Matrix> choosen = new List<Matrix>();
             DisplayMatrixes(matrixes);
-            Console.WriteLine("Choissisez une matrice :");
+            //Console.WriteLine("Choissisez une matrice :");
 
             bool again = false;
             do
             {
+                Console.WriteLine("Choissisez une matrice :");
                 int choosenID = ChooseIntegerOption(matrixes.Count);
                 choosen.Add(matrixes[choosenID]);
 

@@ -14,7 +14,9 @@ namespace Devoir2
 
         public Matrix(Matrix m)
         {
-
+            this.data = m.data;
+            this.rows = m.rows;
+            this.cols = m.cols;
         }
 
         public Matrix(double[,] data)
@@ -91,6 +93,192 @@ namespace Devoir2
             return rm;
         }
 
+        public Matrix scallarProduct(double p_nbr)
+        {
+            Matrix rm = new Matrix(rows, cols);
+            rm.data = new double[rows, cols];
+
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    rm.data[i, j] = data[i, j] * p_nbr;
+                }
+            }
+            return rm;
+        }
+        public bool isTriangular(int triangular_type, bool check_is_strict_triangular)
+        {
+            if (rows != cols)
+            {
+                Console.WriteLine("La matrice doit etre carrée pour vérifier sa triangularité.");
+                return false;
+            }
+
+
+            int z = 0;
+            int not_triangular_sup = 0;
+            int not_triangular_inf = 0;
+            int not_triangular_sup_strict = 0;
+            int not_triangular_inf_strict = 0;
+
+
+            /*******************************/
+            //À Vérifier, mais normalement on peut break; quand une des 4 variables not_... s'increment, car de toute facon si != 0 ca marche deja plus.
+            /*******************************/
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    if (i > j && data[i, j] == 0)
+                    {
+                        z++;
+                    }
+                    else if (i > j)
+                    {
+                        not_triangular_sup++;
+                    }
+                    if (i < j && data[i, j] == 0)
+                    {
+                        z++;
+                    }
+                    else if (i < j)
+                    {
+                        not_triangular_inf++;
+                    }
+
+                    if (i >= j && data[i, j] == 0)
+                    {
+                        z++;
+                    }
+                    else if (i >= j)
+                    {
+                        not_triangular_sup_strict++;
+                    }
+                    if (i <= j && data[i, j] == 0)
+                    {
+                        z++;
+                    }
+                    else if (i <= j)
+                    {
+                        not_triangular_inf_strict++;
+                    }
+                }
+            }
+
+
+            if (triangular_type == 0 && check_is_strict_triangular == false) //Triangulaire supérieur
+            {
+                if (not_triangular_sup != 0)
+                {
+                    return false;
+                }
+            }
+            else if (triangular_type == 1 && check_is_strict_triangular == false) //Triangulaire inférieure
+            {
+                if (not_triangular_inf != 0)
+                {
+                    return false;
+                }
+            }
+            else if (triangular_type == 3 && check_is_strict_triangular == false) //Triangulaire peu importe (inf. ou sup.)
+            {
+                if (not_triangular_sup != 0 || not_triangular_inf != 0)
+                {
+                    return false;
+                }
+            }
+
+
+
+            else if (triangular_type == 0 && check_is_strict_triangular == true) //Triangulaire supérieur STRICT
+            {
+                if (not_triangular_sup_strict != 0)
+                {
+                    return false;
+                }
+            }
+            else if (triangular_type == 1 && check_is_strict_triangular == true) //Triangulaire inférieure STRICT
+            {
+                if (not_triangular_inf_strict != 0)
+                {
+                    return false;
+                }
+            }
+            else if (triangular_type == 3 && check_is_strict_triangular == true) //Triangulaire peu importe (inf. ou sup.) STRICT
+            {
+                if (not_triangular_sup_strict != 0 || not_triangular_inf_strict != 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+
+
+            //OLD
+            /*
+            if (triangular_type == 0) //Triangulaire supérieur
+            {
+                int z = 0;
+                int w = 0;
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < cols; j++)
+                    {
+                        if (i > j && data[i, j] == 0)
+                        {
+                            z++;
+                        }
+                        else if (i > j)
+                        {
+                            w++;
+                        }
+                    }
+                }
+
+                if (w != 0)
+                {
+                    return false;
+                }
+                return true;
+            }
+            else if (triangular_type == 1) //Triangulaire inférieure
+            {
+                int z = 0;
+                int w = 0;
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < cols; j++)
+                    {
+                        if (i < j && data[i, j] == 0)
+                        {
+                            z++;
+                        }
+                        else if (i < j)
+                        {
+                            w++;
+                        }
+                    }
+                }
+
+                if (w != 0)
+                {
+                    return false;
+                }
+                return true;
+            }
+            else if (triangular_type == 3) //Triangulaire peu importe (inf. ou sup.)
+            {
+                return true;
+            }
+            else
+            {
+                return false; // erreur mauvais parametres
+            }
+            */
+        }
+
         public void fillMatrixWithData(int id)
         {
             Console.WriteLine("Insertion des données de la matrice "+id);
@@ -118,20 +306,7 @@ namespace Devoir2
             }
         }
 
-        public Matrix scallarProduct(double p_nbr)
-        {
-            Matrix rm = new Matrix(rows, cols);
-            rm.data = new double[rows, cols];
 
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < cols; j++)
-                {
-                    rm.data[i, j] = data[i, j] * p_nbr;
-                }
-            }
-            return rm;
-        }
 
         public void fillMatrix()
         {
