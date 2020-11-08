@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace Devoir2
     {
         static void Main(string[] args)
         {
-
+            
             Matrix m0 = new Matrix(new double[,]
             {
                     //pour tester parametre 0 ( triangulaire supérieure)
@@ -46,7 +47,7 @@ namespace Devoir2
                     {4, 5, 1}
                     */
 
-                    
+                   
                     {0, 0, 0},
                     {5, 0, 0},
                     {0, 9, 0}
@@ -54,20 +55,17 @@ namespace Devoir2
                     
             });
 
-
-            //Console.WriteLine( "Est-elle triangulaire? : " + m0.isTriangular(0,true));
-            Console.WriteLine("Est-elle triangulaire? : " + m0.isTriangular(1, false));
-
-
+            /*Console.WriteLine("Est-elle triangulaire? : " + m0.VerifyTriangular(0, true));
+            Console.WriteLine("Est-elle triangulaire? : " + m0.VerifyTriangular(1, false));
 
             //Trace de la matrice
-            Matrix m12 = new Matrix(new double[,]
+            /*Matrix m12 = new Matrix(new double[,]
             {
                 /*
                     {1, 2, 3},
                     {4, 5, 6}
                 */
-                    {1, 2, 3},
+                    /*{1, 2, 3},
                     {4, 5, 6},
                     {7, 8, 9}
             });
@@ -81,7 +79,7 @@ namespace Devoir2
                      {4, 5, 6}*/
 
                     
-                        {2, 6, 8},
+                        /*{2, 6, 8},
                         {10, 12, 14},
                         {16, 18, 20}
 
@@ -89,9 +87,6 @@ namespace Devoir2
             });
             Console.WriteLine("Quel est sa matrice transposée? ");
             m11.transpose().display();
-
-
-
 
             //Addition de matrices
             Matrix m1 = new Matrix(new double[,]
@@ -106,7 +101,6 @@ namespace Devoir2
                     {4, -4, 3},
                     {2, -8, 1}
             });
-
             m1.addition(m2).display();
 
             //Test multiplication de matrices
@@ -116,14 +110,12 @@ namespace Devoir2
                     {-5, 1},
                     {-1, 0}
             });
-
             Matrix m4 = new Matrix(new double[,]
             {
                     {8, 6},
                     {-6, 7}
             });
-
-            m3.multiply(m4).display();
+            //m3.multiply(m4).display();
 
             //Test produit scallaire
             Matrix m5 = new Matrix(new double[,]
@@ -132,8 +124,7 @@ namespace Devoir2
                     {6, -4, 4},
                     {1, 4, 1}
             });
-
-            m5.scallarProduct(2).display();
+            m5.scallarProduct(2).display();*/
 
             bool done = false;
             int i = 0;
@@ -186,7 +177,6 @@ namespace Devoir2
                 }
             } while (!done);
 
-
             done = false;
             do
             {
@@ -225,40 +215,44 @@ namespace Devoir2
                             matrixes.Add(resultMatrix);
                             break;
                         case "3":
-                            //pour aller plus vite lors du test
-                            Matrix a1 = new Matrix(new double[,]
-                            {
-                            {1,2,3},
-                            {4,5,6}
-                            });
-
-                            Matrix a2 = new Matrix(new double[,]
-                            {
-                            {1,2,3},
-                            {4,5,6},
-                            {7,8,9}
-                            });
-
-                            Matrix a3 = new Matrix(new double[,]
-                            {
-                            {1,2},
-                            {3,4},
-                            {5,6}
-                            });
-
-                            matrixes.Add(a1);
-                            matrixes.Add(a2);
-                            matrixes.Add(a3);
-
-
-                            operationMatrixes = AskForMatrixes(matrixes);
+                            operationMatrixes = AskForMatrixes(matrixes);;
                             operationMatrix = new Matrix(operationMatrixes[0]);
                             operationMatrixes.RemoveAt(0);
-                            //resultMatrix = operationMatrix.multiplyV2(operationMatrixes);             // à Faire quand vincent est là
-                            //resultMatrix.display();
-                            //matrixes.Add(resultMatrix);
+                            int nbProducts = 0;
+                            resultMatrix = operationMatrix.MultiplyMultipleMatrixes(operationMatrixes, ref nbProducts);             // à Faire quand vincent est là
+                            resultMatrix.display();
+                            Console.WriteLine(string.Format("Opération effectuée avec {0} produits.", nbProducts));
+                            matrixes.Add(resultMatrix);
                             break;
                         case "4":
+                            Matrix m = AskForMatrixes(matrixes, 1)[0];
+                            if(m.Rows == m.Cols)
+                            {
+                                bool[] bools = m.VerifyTriangular();
+
+                                if (bools[0])
+                                    Console.WriteLine("La matrice est triangulaire supérieure.");
+                                else
+                                    Console.WriteLine("La matrice n'est pas triangulaire supérieure.");
+
+                                if (bools[1])
+                                    Console.WriteLine("La matrice est triangulaire supérieure stricte.");
+                                else
+                                    Console.WriteLine("La matrice n'est pas triangulaire supérieure stricte.");
+
+                                if (bools[2])
+                                    Console.WriteLine("La matrice est triangulaire inférieure.");
+                                else
+                                    Console.WriteLine("La matrice n'est pas triangulaire inférieure.");
+
+                                if (bools[3])
+                                    Console.WriteLine("La matrice est triangulaire inférieure stricte.");
+                                else
+                                    Console.WriteLine("La matrice n'est pas triangulaire inférieure stricte.");
+
+                            }
+                            else
+                                Console.WriteLine("La matrice doit etre carrée pour vérifier sa triangularité.");
 
                             break;
                         case "5":
@@ -273,8 +267,9 @@ namespace Devoir2
                             Console.WriteLine("Mauvaise entrée");
                             break;
                     }
-
+                    Console.WriteLine();
                 } while (!menuOk);
+                Console.WriteLine();
             } while (!done);
             Console.ReadLine();
         }
@@ -357,6 +352,7 @@ namespace Devoir2
             } while (!ok);
             return false;
         }
+
         private static double AskForScalar()
         {
             bool ok = false;

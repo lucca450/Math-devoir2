@@ -33,55 +33,64 @@ namespace Devoir2
             data = new double[rows, cols];          
         }
 
-        public double[,] getData()
+        public int Rows
         {
-            return data; 
-        }
-
-        public void setData(double[,] data)
-        {
-            this.data = data;
-        }
-
-        public double getTrace()
-        {
-            if (rows != cols)
+            get
             {
+                return rows;
+            }
+        }
+        public int Cols
+        {
+            get
+            {
+                return cols;
+            }
+        }
+        public double[,] Data
+        {
+            get
+            {
+                return data;
+            }
+            set
+            {
+                data = value;
+            }
+        }
+
+        public double Trace
+        {
+            get
+            {
+                if(rows == cols)
+                {
+                    double trace = 0;
+
+                    for (int i = 0; i < rows; i++)
+                    {
+                        trace += data[i, i];
+                    }
+                    return trace;
+                }
                 return double.NaN;
             }
-            else
-            {
-                double trace = 0;
-
-                for (int i = 0; i < rows; i++)
-                {
-                    trace += data[i,i];
-                }
-            return trace;
-            }
         }
-
-
-
-        public Matrix transpose()
-        {            
-            Matrix rm = new Matrix(cols,rows);
-            if (rows == 0 && cols == 0 || rows == 0 && cols == 1)
+        public Matrix Transpose
+        {
+            get
             {
+                Matrix rm = new Matrix(cols, rows);
+
+                for (int i = 0; i < cols; i++)
+                {
+                    for (int j = 0; j < rows; j++)
+                    {
+                        rm.data[i, j] = data[j, i];
+                    }
+                }
                 return rm;
             }
-
-
-
-            for (int i = 0; i < cols; i++)
-            {
-                for (int j = 0; j < rows; j++)
-                {
-                    rm.data[i, j] = data[j, i];
-                }
-            }
-
-            return rm;
         }
 
 
@@ -105,7 +114,6 @@ namespace Devoir2
                 Console.WriteLine();
             }
         }
-
         public Matrix addition(Matrix p_matrix)
         {
             if (rows == p_matrix.rows && cols == p_matrix.cols)
@@ -120,15 +128,13 @@ namespace Devoir2
             }
             return null;
         }
-
-        public Matrix multiply(Matrix p_matrix)
+        public Matrix multiply(Matrix p_matrix, ref int nbProducts)
         {
             if (cols != p_matrix.rows)
             {
-                throw new InvalidOperationException ("Le nombre de colonnes de la première matrice doit etre égal au nombre de lignes de la deuxième matrice."); 
+                Console.WriteLine("Le nombre de colonnes de la première matrice doit etre égal au nombre de lignes de la deuxième matrice."); 
             }
-            Matrix rm = new Matrix(rows,cols);
-            rm.data = new double[rows, p_matrix.cols];
+            Matrix rm = new Matrix(rows, p_matrix.cols);
 
             for (int i = 0; i < rows; i++)
             {
@@ -137,12 +143,31 @@ namespace Devoir2
                     for (int z = 0; z < cols; z++)
                     {
                         rm.data[i, j] += data[i, z] * p_matrix.data[z, j];
+                        nbProducts++;
                     }
                 }
             }
             return rm;
         }
+        public Matrix MultiplyMultipleMatrixes(List<Matrix> matrixes, ref int nbProducts)
+        {
+            Matrix result = new Matrix(this);
 
+            int i = 0;
+            foreach(Matrix m in matrixes)
+            {
+                if(result.cols == m.rows)
+                {
+                    result = result.multiply(m, ref nbProducts);
+                }
+                else
+                {
+                    Console.WriteLine(string.Format("La matrice #{0} a été exclue du calcul, car son nombre de colonne doit etre égal au nombre de ligne de la premiere matrice.",i));
+                }
+                i++;
+            }
+            return result;
+        }
         public Matrix scallarProduct(double p_nbr)
         {
             Matrix rm = new Matrix(rows, cols);
@@ -157,178 +182,40 @@ namespace Devoir2
             }
             return rm;
         }
-        public bool isTriangular(int triangular_type, bool check_is_strict_triangular)
+        public bool[] VerifyTriangular(int triangular_type= 0, bool check_is_strict_triangular= false)
         {
-            if (rows != cols)
+            bool upper = true, lower = true, s_upper = true, s_lower = true;
+
+            for (int i = 1; i < cols; i++)      // Upper
             {
-                Console.WriteLine("La matrice doit etre carrée pour vérifier sa triangularité.");
-                return false;
-            }
-
-
-            int z = 0;
-            int not_triangular_sup = 0;
-            int not_triangular_inf = 0;
-            int not_triangular_sup_strict = 0;
-            int not_triangular_inf_strict = 0;
-
-
-            /*******************************/
-            //À Vérifier, mais normalement on peut break; quand une des 4 variables not_... s'increment, car de toute facon si != 0 ca marche deja plus.
-            /*******************************/
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < cols; j++)
-                {
-                    if (i > j && data[i, j] == 0)
+                if (data[i, i] != 0)
+                    s_upper = false;
+                for (int j = 0; j < i; j++)
+                    if (data[i, j] != 0)
                     {
-                        z++;
+                        upper = false;
+                        s_upper = false;
+                        break;
                     }
-                    else if (i > j)
+                if (!upper) break;
+            }
+
+            for (int i = 0; i < cols; i++)         // lower
+            {
+                if (data[i, i] != 0)
+                    s_lower = false;
+                for (int j = i + 1; j < cols; j++)
+                    if (data[i, j] != 0)
                     {
-                        not_triangular_sup++;
+                        lower = false;
+                        s_lower = false;
+                        break;
                     }
-                    if (i < j && data[i, j] == 0)
-                    {
-                        z++;
-                    }
-                    else if (i < j)
-                    {
-                        not_triangular_inf++;
-                    }
-
-                    if (i >= j && data[i, j] == 0)
-                    {
-                        z++;
-                    }
-                    else if (i >= j)
-                    {
-                        not_triangular_sup_strict++;
-                    }
-                    if (i <= j && data[i, j] == 0)
-                    {
-                        z++;
-                    }
-                    else if (i <= j)
-                    {
-                        not_triangular_inf_strict++;
-                    }
-                }
+                if (!lower) break;
             }
 
-
-            if (triangular_type == 0 && check_is_strict_triangular == false) //Triangulaire supérieur
-            {
-                if (not_triangular_sup != 0)
-                {
-                    return false;
-                }
-            }
-            else if (triangular_type == 1 && check_is_strict_triangular == false) //Triangulaire inférieure
-            {
-                if (not_triangular_inf != 0)
-                {
-                    return false;
-                }
-            }
-            else if (triangular_type == 3 && check_is_strict_triangular == false) //Triangulaire peu importe (inf. ou sup.)
-            {
-                if (not_triangular_sup != 0 || not_triangular_inf != 0)
-                {
-                    return false;
-                }
-            }
-
-
-
-            else if (triangular_type == 0 && check_is_strict_triangular == true) //Triangulaire supérieur STRICT
-            {
-                if (not_triangular_sup_strict != 0)
-                {
-                    return false;
-                }
-            }
-            else if (triangular_type == 1 && check_is_strict_triangular == true) //Triangulaire inférieure STRICT
-            {
-                if (not_triangular_inf_strict != 0)
-                {
-                    return false;
-                }
-            }
-            else if (triangular_type == 3 && check_is_strict_triangular == true) //Triangulaire peu importe (inf. ou sup.) STRICT
-            {
-                if (not_triangular_sup_strict != 0 || not_triangular_inf_strict != 0)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-
-
-            //OLD
-            /*
-            if (triangular_type == 0) //Triangulaire supérieur
-            {
-                int z = 0;
-                int w = 0;
-                for (int i = 0; i < rows; i++)
-                {
-                    for (int j = 0; j < cols; j++)
-                    {
-                        if (i > j && data[i, j] == 0)
-                        {
-                            z++;
-                        }
-                        else if (i > j)
-                        {
-                            w++;
-                        }
-                    }
-                }
-
-                if (w != 0)
-                {
-                    return false;
-                }
-                return true;
-            }
-            else if (triangular_type == 1) //Triangulaire inférieure
-            {
-                int z = 0;
-                int w = 0;
-                for (int i = 0; i < rows; i++)
-                {
-                    for (int j = 0; j < cols; j++)
-                    {
-                        if (i < j && data[i, j] == 0)
-                        {
-                            z++;
-                        }
-                        else if (i < j)
-                        {
-                            w++;
-                        }
-                    }
-                }
-
-                if (w != 0)
-                {
-                    return false;
-                }
-                return true;
-            }
-            else if (triangular_type == 3) //Triangulaire peu importe (inf. ou sup.)
-            {
-                return true;
-            }
-            else
-            {
-                return false; // erreur mauvais parametres
-            }
-            */
+            return new bool[] { upper, s_upper, lower, s_lower };
         }
-
         public void fillMatrixWithData(int id)
         {
             Console.WriteLine("Insertion des données de la matrice "+id);
@@ -355,20 +242,5 @@ namespace Devoir2
                 }
             }
         }
-
-
-
-        public void fillMatrix()
-        {
-            for (int i = 0; i < rows; ++i)
-            {
-                for (int j = 0; j < cols; ++j)
-                {
-                    data[i, j] = 0;
-                }
-            }
-        }
-
-
     }
 }
