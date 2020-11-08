@@ -43,8 +43,58 @@ namespace Devoir2
             this.data = data;
         }
 
+        public double getTrace()
+        {
+            if (rows != cols)
+            {
+                return double.NaN;
+            }
+            else
+            {
+                double trace = 0;
+
+                for (int i = 0; i < rows; i++)
+                {
+                    trace += data[i,i];
+                }
+            return trace;
+            }
+        }
+
+
+
+        public Matrix transpose()
+        {            
+            Matrix rm = new Matrix(cols,rows);
+            if (rows == 0 && cols == 0 || rows == 0 && cols == 1)
+            {
+                return rm;
+            }
+
+
+
+            for (int i = 0; i < cols; i++)
+            {
+                for (int j = 0; j < rows; j++)
+                {
+                    rm.data[i, j] = data[j, i];
+                }
+            }
+
+            return rm;
+        }
+
+
+
+
+
         public void display()
         {
+            if (rows == 0 && cols == 0 || rows == 0 && cols == 1)
+            {
+                Console.WriteLine("La matrice est vide");
+                return;
+            }
             Console.WriteLine("Matrice: \n");
             for (int i = 0; i < rows; i++)
             {

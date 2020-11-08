@@ -40,7 +40,7 @@ namespace Devoir2
                     {4, 5, 1}
                     */
                     
-                   /* 
+                   /*
                     {5, 0, 0},
                     {1, -4, 4},
                     {4, 5, 1}
@@ -57,6 +57,40 @@ namespace Devoir2
 
             //Console.WriteLine( "Est-elle triangulaire? : " + m0.isTriangular(0,true));
             Console.WriteLine("Est-elle triangulaire? : " + m0.isTriangular(1, false));
+
+
+
+            //Trace de la matrice
+            Matrix m12 = new Matrix(new double[,]
+            {
+                /*
+                    {1, 2, 3},
+                    {4, 5, 6}
+                */
+                    {1, 2, 3},
+                    {4, 5, 6},
+                    {7, 8, 9}
+            });
+            Console.WriteLine("Quel est sa trace? " + m12.getTrace());
+
+            //Trace de la matrice
+            Matrix m11 = new Matrix(new double[,]
+            {
+
+                    /* {1, 2, 3},
+                     {4, 5, 6}*/
+
+                    
+                        {2, 6, 8},
+                        {10, 12, 14},
+                        {16, 18, 20}
+
+                    
+            });
+            Console.WriteLine("Quel est sa matrice transposée? ");
+            m11.transpose().display();
+
+
 
 
             //Addition de matrices
