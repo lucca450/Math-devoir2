@@ -49,11 +49,13 @@ namespace Devoir2
 
                    
                     {0, 0, 0},
-                    {5, 0, 0},
-                    {0, 9, 0}
+                    {0, 0, 0},
+                    {0, 0, 0}
                     
                     
             });
+
+
 
             /*Console.WriteLine("Est-elle triangulaire? : " + m0.VerifyTriangular(0, true));
             Console.WriteLine("Est-elle triangulaire? : " + m0.VerifyTriangular(1, false));
@@ -65,66 +67,66 @@ namespace Devoir2
                     {1, 2, 3},
                     {4, 5, 6}
                 */
-                    /*{1, 2, 3},
-                    {4, 5, 6},
-                    {7, 8, 9}
-            });
-            Console.WriteLine("Quel est sa trace? " + m12.getTrace());
+            /*{1, 2, 3},
+            {4, 5, 6},
+            {7, 8, 9}
+    });
+    Console.WriteLine("Quel est sa trace? " + m12.getTrace());
 
-            //Trace de la matrice
-            Matrix m11 = new Matrix(new double[,]
-            {
+    //Trace de la matrice
+    Matrix m11 = new Matrix(new double[,]
+    {
 
-                    /* {1, 2, 3},
-                     {4, 5, 6}*/
+            /* {1, 2, 3},
+             {4, 5, 6}*/
 
-                    
-                        /*{2, 6, 8},
-                        {10, 12, 14},
-                        {16, 18, 20}
 
-                    
-            });
-            Console.WriteLine("Quel est sa matrice transposée? ");
-            m11.transpose().display();
+            /*{2, 6, 8},
+            {10, 12, 14},
+            {16, 18, 20}
 
-            //Addition de matrices
-            Matrix m1 = new Matrix(new double[,]
-            {
-                    {5, 0, 2},
-                    {6, -4, 4},
-                    {1, 4, 1}
-            });
-            Matrix m2 = new Matrix(new double[,]
-            {
-                    {4, 1, 0},
-                    {4, -4, 3},
-                    {2, -8, 1}
-            });
-            m1.addition(m2).display();
 
-            //Test multiplication de matrices
-            Matrix m3 = new Matrix(new double[,]
-            {
-                    {2, 4},
-                    {-5, 1},
-                    {-1, 0}
-            });
-            Matrix m4 = new Matrix(new double[,]
-            {
-                    {8, 6},
-                    {-6, 7}
-            });
-            //m3.multiply(m4).display();
+});
+Console.WriteLine("Quel est sa matrice transposée? ");
+m11.transpose().display();
 
-            //Test produit scallaire
-            Matrix m5 = new Matrix(new double[,]
-            {
-                    {5, 0, 2},
-                    {6, -4, 4},
-                    {1, 4, 1}
-            });
-            m5.scallarProduct(2).display();*/
+//Addition de matrices
+Matrix m1 = new Matrix(new double[,]
+{
+        {5, 0, 2},
+        {6, -4, 4},
+        {1, 4, 1}
+});
+Matrix m2 = new Matrix(new double[,]
+{
+        {4, 1, 0},
+        {4, -4, 3},
+        {2, -8, 1}
+});
+m1.addition(m2).display();
+
+//Test multiplication de matrices
+Matrix m3 = new Matrix(new double[,]
+{
+        {2, 4},
+        {-5, 1},
+        {-1, 0}
+});
+Matrix m4 = new Matrix(new double[,]
+{
+        {8, 6},
+        {-6, 7}
+});
+//m3.multiply(m4).display();
+
+//Test produit scallaire
+Matrix m5 = new Matrix(new double[,]
+{
+        {5, 0, 2},
+        {6, -4, 4},
+        {1, 4, 1}
+});
+m5.scallarProduct(2).display();*/
 
             bool done = false;
             int i = 0;

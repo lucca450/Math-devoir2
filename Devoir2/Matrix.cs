@@ -58,7 +58,6 @@ namespace Devoir2
                 data = value;
             }
         }
-
         public double Trace
         {
             get
@@ -92,9 +91,31 @@ namespace Devoir2
                 return rm;
             }
         }
+        public bool IsSquare
+        {
+            get
+            {
+                if (rows == cols)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
 
 
 
+        public double getElement(int row, int col)
+        {
+            return Data[row,col];
+        }
+        public void setElement(int row, int col, double value)
+        {
+            Data[row, col] = value;
+        }
 
 
         public void display()
