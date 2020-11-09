@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,11 +29,20 @@ namespace Devoir2
             this.cols = data.GetLength(1);
         }
 
+        internal Matrix Clone()
+        {
+            Matrix other = (Matrix)this.MemberwiseClone();
+            other.cols = cols;
+            other.rows = rows;
+            other.data = (double[,])data.Clone();
+            return other;
+        }
+
         public Matrix(int rows, int cols)
         {
             this.rows = rows;
             this.cols = cols;
-            data = new double[rows, cols];          
+            data = new double[rows, cols];
         }
 
         public int Rows
@@ -62,7 +74,7 @@ namespace Devoir2
         {
             get
             {
-                if(rows == cols)
+                if (IsSquare)
                 {
                     double trace = 0;
 
@@ -91,22 +103,166 @@ namespace Devoir2
                 return rm;
             }
         }
+        public double Determinant
+        {
+            get
+            {
+                if (IsSquare)
+                {
+                    return Determinant_fct(Data, Cols);
+                }
+                return double.NaN;
+            }
+        }
+        private void getCofactor(double[,] data, double[,] temp, int p, int q, int n)
+        {
+            int i = 0, j = 0;
+
+            // Looping for each element of
+            // the matrix
+            for (int row = 0; row < n; row++)
+            {
+                for (int col = 0; col < n; col++)
+                {
+
+                    // Copying into temporary matrix
+                    // only those element which are
+                    // not in given row and column
+                    if (row != p && col != q)
+                    {
+                        temp[i, j++] = data[row, col];
+
+                        // Row is filled, so increase
+                        // row index and reset col
+                        // index
+                        if (j == n - 1)
+                        {
+                            j = 0;
+                            i++;
+                        }
+                    }
+                }
+            }
+        }
+        private double Determinant_fct(double[,] data, int n)
+        {
+            int nbRows = n;
+            if (nbRows == 1)
+                return data[0, 0];
+            else if (nbRows == 2)
+            {
+                return data[0, 0] * data[1, 1] - data[1, 0] * data[0, 1];
+            }
+            else
+            {
+                double D = 0;
+                // To store cofactors
+                double[,] temp = new double[n, n];
+
+                // To store sign multiplier
+                int sign = 1;
+
+                // Iterate for each element
+                // of first row
+                for (int f = 0; f < n; f++)
+                {
+                    // Getting Cofactor of mat[0][f]
+                    getCofactor(data, temp, 0, f, n);
+                    D += sign * data[0, f] * Determinant_fct(temp, n - 1);
+
+                    // terms are to be added with
+                    // alternate sign
+                    sign = -sign;
+                }
+                return D;
+            }
+        }
+
+        public Matrix CoMatrice 
+        {
+            get
+            {
+                if (IsSquare)
+                {
+                    Matrix m;
+                    if (cols == 1)
+                    {
+                        m = new Matrix(1, 1);
+                        m.data[0, 0] = 1;
+                        return m;
+                    }
+                    else if(cols == 2)
+                    {
+                        m = Clone();
+
+                        double temp = m.data[0, 1];
+                        m.data[0, 1] = -m.data[1, 0];
+                        m.data[1, 0] = -temp;
+
+                        temp = m.data[0, 0];
+                        m.data[0, 0] = m.data[1, 1];
+                        m.data[1, 1] = temp;
+
+                        return m;
+                    }
+                    else
+                    {
+                        int sign;
+                        m = Clone();
+                        double[,] temp = new double[cols, cols];
+
+                        for (int i = 0; i < m.cols; i++)
+                        {
+                            for (int j = 0; j < m.cols; j++)
+                            {
+                                // Get cofactor of A[i,j] 
+                                getCofactor(m.data, temp, i, j, m.cols);
+
+                                // sign of adj[j,i] positive if sum of row 
+                                // and column indexes is even. 
+                                sign = ((i + j) % 2 == 0) ? 1 : -1;
+
+                                // Interchanging rows and columns to get the 
+                                // transpose of the cofactor matrix 
+                                m.data[j, i] *= sign /** Determinant_fct(temp, m.cols - 1)*/;
+                            }
+                        }
+                        return m;
+                    }  
+                }
+                return null;
+            }
+        }
+
+        public Matrix Reversed 
+        {
+            get
+            {
+                if (IsSquare)
+                {
+                    Matrix m = Clone();
+                    for (int i = 0; i < rows; i++)
+                    {
+                        for (int j = 0; j < cols; j++)
+                        {
+                            m.data[i, j] = 1 / m.data[i, j];
+                        }
+                    }
+                    return m;
+                }
+                return null;
+            }
+        }
+
         public bool IsSquare
         {
             get
             {
-                if (rows == cols)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return rows == cols;            
             }
         }
 
-
+        public bool IsRegular { get; internal set; }
 
         public double getElement(int row, int col)
         {
@@ -203,39 +359,57 @@ namespace Devoir2
             }
             return rm;
         }
-        public bool[] VerifyTriangular(int triangular_type= 0, bool check_is_strict_triangular= false)
+        public bool VerifyTriangular(int option, int option2)
         {
-            bool upper = true, lower = true, s_upper = true, s_lower = true;
+            bool upper = false, s_upper = false, lower = false, s_lower = false;
 
-            for (int i = 1; i < cols; i++)      // Upper
+            if (option == 0 || option == 2)                                     // Supérieur
             {
-                if (data[i, i] != 0)
-                    s_upper = false;
-                for (int j = 0; j < i; j++)
-                    if (data[i, j] != 0)
-                    {
-                        upper = false;
+                for (int i = 1; i < cols; i++)
+                {
+                    if (data[i, i] != 0)
                         s_upper = false;
-                        break;
-                    }
-                if (!upper) break;
+                    for (int j = 0; j < i; j++)
+                        if (data[i, j] != 0)
+                        {
+                            upper = false;
+                            s_upper = false;
+                            break;
+                        }
+                    if (!upper) break;
+                }
+                if (option2 == 0)                                   // Stricte
+                    return s_upper;
+                else
+                    return upper;
             }
 
-            for (int i = 0; i < cols; i++)         // lower
+            if(option == 1 || option == 2)                                     // Inférieur
             {
-                if (data[i, i] != 0)
-                    s_lower = false;
-                for (int j = i + 1; j < cols; j++)
-                    if (data[i, j] != 0)
-                    {
-                        lower = false;
+                for (int i = 0; i < cols; i++)
+                {
+                    if (data[i, i] != 0)
                         s_lower = false;
-                        break;
-                    }
-                if (!lower) break;
+                    for (int j = i + 1; j < cols; j++)
+                        if (data[i, j] != 0)
+                        {
+                            lower = false;
+                            s_lower = false;
+                            break;
+                        }
+                    if (!lower) break;
+                }
+                if (option2 == 0)                                   // Stricte                         
+                    return s_lower;
+                else
+                    return lower;
             }
 
-            return new bool[] { upper, s_upper, lower, s_lower };
+            if(option == 2)                                     // Peu importe
+            {
+                return s_upper || s_lower;
+            }
+            return new bool();
         }
         public void fillMatrixWithData(int id)
         {
@@ -244,7 +418,7 @@ namespace Devoir2
             {
                 for (int j = 0; j < cols; j++)
                 {
-                    Console.Write(string.Format("Donnée [{0},{1}]", i, j));
+                    Console.Write(string.Format("Donnée [{0},{1}] : ", i, j));
                     bool ok = false;
 
                     do
@@ -258,6 +432,7 @@ namespace Devoir2
                         catch
                         {
                             throw new Exception("La donnée doit être un chiffre");
+                            ok = false;
                         }
                     } while (!ok);
                 }

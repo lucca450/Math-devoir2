@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
@@ -12,124 +13,14 @@ namespace Devoir2
 {
     class Program
     {
+
+        static void test(double [,] data)
+        {
+            data = new double[1,1];
+        }
         static void Main(string[] args)
         {
-            
-            Matrix m0 = new Matrix(new double[,]
-            {
-                    //pour tester parametre 0 ( triangulaire supérieure)
-                    /*
-                    {5, 0, 2},
-                    {0, -4, 4},
-                    {0, 0, 1}
-                    */
-                    /*
-                    {5, 0, 2},
-                    {1, -4, 4},
-                    {0, 0, 1}
-                    */
-                    /*
-                    {0, 0, 2},
-                    {0, 0, 4},
-                    {0, 0, 0}
-                    */
-
-                    //pour tester parametre 0 ( triangulaire inférieure)
-                    /*
-                    {5, 0, 0},
-                    {1, 4, 0},
-                    {4, 5, 1}
-                    */
-                    
-                   /*
-                    {5, 0, 0},
-                    {1, -4, 4},
-                    {4, 5, 1}
-                    */
-
-                   
-                    {0, 0, 0},
-                    {0, 0, 0},
-                    {0, 0, 0}
-                    
-                    
-            });
-
-
-
-            /*Console.WriteLine("Est-elle triangulaire? : " + m0.VerifyTriangular(0, true));
-            Console.WriteLine("Est-elle triangulaire? : " + m0.VerifyTriangular(1, false));
-
-            //Trace de la matrice
-            /*Matrix m12 = new Matrix(new double[,]
-            {
-                /*
-                    {1, 2, 3},
-                    {4, 5, 6}
-                */
-            /*{1, 2, 3},
-            {4, 5, 6},
-            {7, 8, 9}
-    });
-    Console.WriteLine("Quel est sa trace? " + m12.getTrace());
-
-    //Trace de la matrice
-    Matrix m11 = new Matrix(new double[,]
-    {
-
-            /* {1, 2, 3},
-             {4, 5, 6}*/
-
-
-            /*{2, 6, 8},
-            {10, 12, 14},
-            {16, 18, 20}
-
-
-});
-Console.WriteLine("Quel est sa matrice transposée? ");
-m11.transpose().display();
-
-//Addition de matrices
-Matrix m1 = new Matrix(new double[,]
-{
-        {5, 0, 2},
-        {6, -4, 4},
-        {1, 4, 1}
-});
-Matrix m2 = new Matrix(new double[,]
-{
-        {4, 1, 0},
-        {4, -4, 3},
-        {2, -8, 1}
-});
-m1.addition(m2).display();
-
-//Test multiplication de matrices
-Matrix m3 = new Matrix(new double[,]
-{
-        {2, 4},
-        {-5, 1},
-        {-1, 0}
-});
-Matrix m4 = new Matrix(new double[,]
-{
-        {8, 6},
-        {-6, 7}
-});
-//m3.multiply(m4).display();
-
-//Test produit scallaire
-Matrix m5 = new Matrix(new double[,]
-{
-        {5, 0, 2},
-        {6, -4, 4},
-        {1, 4, 1}
-});
-m5.scallarProduct(2).display();*/
-
             bool done = false;
-            int i = 0;
             List<Matrix> matrixes = new List<Matrix>();
             do
             {
@@ -145,33 +36,13 @@ m5.scallarProduct(2).display();*/
                     Matrix newMatrix = new Matrix(nbRow, nbCol);
 
                     newMatrix.fillMatrixWithData(matrixes.Count + 1);
-
                     matrixes.Add(newMatrix);
 
-                    bool ok = false;
+                    List<string> options = new List<string>();
+                    options.Add("Oui");
+                    options.Add("Non");
 
-                    do
-                    {
-                        Console.WriteLine("Voulez-vous ajouter une autre matrice (o,n)?");
-                        string ans = Console.ReadLine();
-                        switch (ans)
-                        {
-                            case "o":
-                            case "O":
-                                done = false;
-                                ok = true;
-                                break;
-                            case "N":
-                            case "n":
-                                done = true;
-                                ok = true;
-                                break;
-                            default:
-                                ok = false;
-                                Console.WriteLine("Réponse incorrecte");
-                                break;
-                        }
-                    } while (!ok);
+                    done = OptionSelection("Voulez-vous ajouter une autre matrice ?", options) == 1;
                 }
                 catch
                 {
@@ -182,98 +53,189 @@ m5.scallarProduct(2).display();*/
             done = false;
             do
             {
+                List<string> options = new List<string>();
+                options.Add("Additionner 2 matrices");
+                options.Add("Faire produit scalaire");
+                options.Add("Faire produit matriciel");
+                options.Add("Vérifier si une matrice est triangulaire");
+                options.Add("Calculer les propiriétés d'une matrice");
+                options.Add("Visualiser les matrices");
+                options.Add("Quitter");
 
-                bool menuOk = true;
-                do
+                int selectedOption = OptionSelection("Que voulez-vous faire?", options);
+               
+                Matrix resultMatrix;
+                List<Matrix> operationMatrixes;
+                switch (selectedOption)
                 {
-                    Console.WriteLine("Que voulez-vous faire ?");
-                    Console.WriteLine(
-                        "1- Additionner 2 matrices" + '\n' +
-                        "2- Faire produit scalaire" + '\n' +
-                        "3- Faire produit matriciel" + '\n' +
-                        "4- Vérifier si une matrice est triangulaire" + '\n' +
-                        "5- Calculer les propiriétés d'une matrice" + '\n' +
-                        "6- Visualiser les matrices" + '\n' +
-                        "7- Quitter");
+                    case 0:                                                                     // Additions
+                        operationMatrixes = AskForMatrixes(matrixes, 2);
+                        resultMatrix = operationMatrixes[0].addition(operationMatrixes[1]);
+                        Console.WriteLine("Matrice résultant de l'addition: ");
+                        resultMatrix.display();
+                        matrixes.Add(resultMatrix);
+                        break;
+                    case 1:                                                                     // Multiplication par scalar
+                        Matrix operationMatrix = AskForMatrixes(matrixes, 1)[0];
+                        double scalar = AskForScalar();
+                        resultMatrix = operationMatrix.scallarProduct(scalar);
+                        Console.WriteLine("Matrice résultant de la multiplication avec un scalaire: ");
+                        resultMatrix.display();
+                        matrixes.Add(resultMatrix);
+                        break;
+                    case 2:                                                                     // Multiplication de matrices
+                        operationMatrixes = AskForMatrixes(matrixes);;
+                        operationMatrix = new Matrix(operationMatrixes[0]);
+                        operationMatrixes.RemoveAt(0);
+                        int nbProducts = 0;
+                        resultMatrix = operationMatrix.MultiplyMultipleMatrixes(operationMatrixes, ref nbProducts);             // à Faire quand vincent est là
+                        resultMatrix.display();
+                        Console.WriteLine(string.Format("Opération effectuée avec {0} produits.", nbProducts));
+                        matrixes.Add(resultMatrix);
+                        break;
+                    case 3:                                                                     // Triangularité
+                        Matrix m = AskForMatrixes(matrixes, 1)[0];
+                        if(m.IsSquare)
+                        {
+                            string initialMessage = "Que voulez-vous faire ?";
 
-                    string ans = Console.ReadLine();
-                    Matrix resultMatrix;
-                    List<Matrix> operationMatrixes;
-                    switch (ans)
-                    {
-                        case "1":
-                            operationMatrixes = AskForMatrixes(matrixes, 2);
-                            resultMatrix = operationMatrixes[0].addition(operationMatrixes[1]);
-                            Console.WriteLine("Matrice résultant de l'addition: ");
-                            resultMatrix.display();
-                            matrixes.Add(resultMatrix);
-                            break;
-                        case "2":
-                            Matrix operationMatrix = AskForMatrixes(matrixes, 1)[0];
-                            double scalar = AskForScalar();
-                            resultMatrix = operationMatrix.scallarProduct(scalar);
-                            Console.WriteLine("Matrice résultant de la multiplication avec un scalaire: ");
-                            resultMatrix.display();
-                            matrixes.Add(resultMatrix);
-                            break;
-                        case "3":
-                            operationMatrixes = AskForMatrixes(matrixes);;
-                            operationMatrix = new Matrix(operationMatrixes[0]);
-                            operationMatrixes.RemoveAt(0);
-                            int nbProducts = 0;
-                            resultMatrix = operationMatrix.MultiplyMultipleMatrixes(operationMatrixes, ref nbProducts);             // à Faire quand vincent est là
-                            resultMatrix.display();
-                            Console.WriteLine(string.Format("Opération effectuée avec {0} produits.", nbProducts));
-                            matrixes.Add(resultMatrix);
-                            break;
-                        case "4":
-                            Matrix m = AskForMatrixes(matrixes, 1)[0];
-                            if(m.Rows == m.Cols)
+                            options = new List<string>();
+                            options.Add("Vérifier la triangularité supérieure");
+                            options.Add("Vérifier la triangularité inférieure");
+                            options.Add("Peu importe");
+
+                            selectedOption = OptionSelection(initialMessage, options);
+
+                            List<string> options2 = new List<string>();
+                            options2.Add("Oui");
+                            options2.Add("Non");
+
+                            int selectedOption2 = OptionSelection("Vérifier strictement ?", options2);
+
+                            bool verificationResult = m.VerifyTriangular(selectedOption, selectedOption2);
+
+                            switch (selectedOption)
                             {
-                                bool[] bools = m.VerifyTriangular();
-
-                                if (bools[0])
-                                    Console.WriteLine("La matrice est triangulaire supérieure.");
-                                else
-                                    Console.WriteLine("La matrice n'est pas triangulaire supérieure.");
-
-                                if (bools[1])
-                                    Console.WriteLine("La matrice est triangulaire supérieure stricte.");
-                                else
-                                    Console.WriteLine("La matrice n'est pas triangulaire supérieure stricte.");
-
-                                if (bools[2])
-                                    Console.WriteLine("La matrice est triangulaire inférieure.");
-                                else
-                                    Console.WriteLine("La matrice n'est pas triangulaire inférieure.");
-
-                                if (bools[3])
-                                    Console.WriteLine("La matrice est triangulaire inférieure stricte.");
-                                else
-                                    Console.WriteLine("La matrice n'est pas triangulaire inférieure stricte.");
-
+                                case 0:                         //Supérieur
+                                    if (selectedOption2 == 0)        //Vérif Strict?
+                                        if (verificationResult)
+                                            Console.WriteLine("La matrice est triangulaire supérieure stricte.");
+                                        else
+                                            Console.WriteLine("La matrice n'est pas triangulaire supérieure stricte.");
+                                    else
+                                        if (verificationResult)
+                                        Console.WriteLine("La matrice est triangulaire supérieure.");
+                                    else
+                                        Console.WriteLine("La matrice n'est pas triangulaire supérieure.");
+                                    break;
+                                case 1:                         //Inférieur
+                                    if (selectedOption2 == 0)        //Vérif Strict?
+                                        if (verificationResult)
+                                            Console.WriteLine("La matrice est triangulaire inférieure stricte.");
+                                        else
+                                            Console.WriteLine("La matrice n'est pas triangulaire inférieure stricte.");
+                                    else
+                                       if (verificationResult)
+                                        Console.WriteLine("La matrice est triangulaire inférieure.");
+                                    else
+                                        Console.WriteLine("La matrice n'est pas triangulaire inférieure.");
+                                    break;
+                                case 2:                         //Peu importe
+                                    if (selectedOption2 == 0)        //Vérif Strict?
+                                        if (verificationResult)
+                                            Console.WriteLine("La matrice est triangulaire stricte.");
+                                        else
+                                            Console.WriteLine("La matrice n'est pas triangulaire stricte.");
+                                    else
+                                       if (verificationResult)
+                                        Console.WriteLine("La matrice est triangulaire.");
+                                    else
+                                        Console.WriteLine("La matrice n'est pas triangulaire.");
+                                    break;
                             }
-                            else
-                                Console.WriteLine("La matrice doit etre carrée pour vérifier sa triangularité.");
+                        }
+                        else
+                            Console.WriteLine("La matrice doit etre carrée pour vérifier sa triangularité.");
 
-                            break;
-                        case "5":
-                            break;
-                        case "6":
-                            break;
-                        case "7":
-                            done = true;
-                            break;
-                        default:
-                            menuOk = false;
-                            Console.WriteLine("Mauvaise entrée");
-                            break;
-                    }
-                    Console.WriteLine();
-                } while (!menuOk);
+                        break;
+                    case 4:
+                        m = AskForMatrixes(matrixes, 1)[0];
+                        Console.WriteLine("Voici les propriétés de la matrice : \n");
+
+                        Console.WriteLine("Trace : " + m.Trace);
+                        Console.WriteLine("Déterminant : " + m.Determinant);
+
+                        Console.WriteLine("Transposée : \n");
+                        Matrix temp = m.Transpose;
+                        if (temp != null)
+                            temp.display();
+                        else
+                            Console.Write("La matrice n'est pas carrée");
+                        Console.WriteLine();
+
+                        Console.WriteLine("Comatrice : \n");
+                        temp = m.CoMatrice;
+                        if (temp != null)
+                            temp.display();
+                        else
+                            Console.Write("La matrice n'est pas carrée");
+                        Console.WriteLine();
+
+                        Console.WriteLine("Matrice inversée : \n ");
+                        temp = m.Reversed;
+                        if (temp != null)
+                            temp.display();
+                        else
+                            Console.Write("La matrice n'est pas carrée");
+
+                        string isSquare = m.IsSquare ? "Oui" : "Non";
+                        Console.WriteLine("Matrice carrée ? " + isSquare);
+                        string isRegular = m.IsRegular ? "Oui" : "Non";
+                        Console.WriteLine("Matrice réguliaire ? " + isRegular);
+                        break;
+                    case 5:
+                        DisplayMatrixes(matrixes);
+                        break;
+                    case 6:
+                        done = true;
+                        break;
+                    default:
+                        Console.WriteLine("Something Wrong");
+                        break;
+                }
+                Console.WriteLine();
                 Console.WriteLine();
             } while (!done);
             Console.ReadLine();
+        }
+
+        private static int OptionSelection(string initialMessage, List<string> options)
+        {
+            int max = options.Count;
+            bool ok = false;
+            do
+            {
+                Console.WriteLine(initialMessage);
+                for(int i = 1; i <= max ; i++)
+                    Console.WriteLine(string.Format("{0}- {1}", i, options[i-1]));
+                try
+                {
+                    int choosenID = int.Parse(Console.ReadLine());
+                    if (choosenID >= 1 && choosenID <= max)
+                    {
+                        ok = true;
+                        return choosenID - 1;
+                    }
+                    else
+                        Console.WriteLine("Mauvaise entrée");
+                }
+                catch
+                {
+                    Console.WriteLine("Mauvaise entrée");
+                }
+
+            } while (!ok);
+            return -1;
         }
 
         private static void DisplayMatrixes(List<Matrix> matrixes)
@@ -314,7 +276,6 @@ m5.scallarProduct(2).display();*/
         {
             List<Matrix> choosen = new List<Matrix>();
             DisplayMatrixes(matrixes);
-            //Console.WriteLine("Choissisez une matrice :");
 
             bool again = false;
             do
@@ -325,34 +286,15 @@ m5.scallarProduct(2).display();*/
 
                 if (max == -1 || choosen.Count != max)
                 {
-                    again = AskForAnother();
+                    List<string> options = new List<string>();
+                    options.Add("Oui");
+                    options.Add("Non");
+
+                    again = OptionSelection("Voulez-vous choisir une autre matrice ?", options) == 0;
                 }
             } while (again);
 
             return choosen;
-        }
-        private static bool AskForAnother()
-        {
-            bool ok = true;
-            do
-            {
-                Console.WriteLine("Voulez-vous choisir une autre matrice (o,n)?");
-                string ans = Console.ReadLine();
-                switch (ans)
-                {
-                    case "o":
-                    case "O":
-                        return true;
-                    case "N":
-                    case "n":
-                        return false;
-                    default:
-                        ok = false;
-                        Console.WriteLine("Réponse incorrecte");
-                        break;
-                }
-            } while (!ok);
-            return false;
         }
 
         private static double AskForScalar()
