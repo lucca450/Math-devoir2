@@ -114,9 +114,11 @@ namespace Devoir2
                 return double.NaN;
             }
         }
-        private void getCofactor(double[,] data, double[,] temp, int p, int q, int n)
+        private double[,] getCofactor(double[,] data, int p, int q, int n)
         {
             int i = 0, j = 0;
+
+            double[,] cofactors = new double[data.Length - 1, data.Length - 1];
 
             // Looping for each element of
             // the matrix
@@ -130,7 +132,7 @@ namespace Devoir2
                     // not in given row and column
                     if (row != p && col != q)
                     {
-                        temp[i, j++] = data[row, col];
+                        cofactors[i, j++] = data[row, col];
 
                         // Row is filled, so increase
                         // row index and reset col
@@ -143,6 +145,7 @@ namespace Devoir2
                     }
                 }
             }
+            return cofactors;
         }
         private double Determinant_fct(double[,] data, int n)
         {
@@ -156,22 +159,14 @@ namespace Devoir2
             else
             {
                 double D = 0;
-                // To store cofactors
-                double[,] temp = new double[n, n];
-
-                // To store sign multiplier
+                double[,] temp;
                 int sign = 1;
 
-                // Iterate for each element
-                // of first row
                 for (int f = 0; f < n; f++)
                 {
-                    // Getting Cofactor of mat[0][f]
-                    getCofactor(data, temp, 0, f, n);
+                    temp = getCofactor(data, 0, f, n);
                     D += sign * data[0, f] * Determinant_fct(temp, n - 1);
 
-                    // terms are to be added with
-                    // alternate sign
                     sign = -sign;
                 }
                 return D;
@@ -209,22 +204,19 @@ namespace Devoir2
                     {
                         int sign;
                         m = Clone();
-                        double[,] temp = new double[cols, cols];
+                        double[,] cofactors;
 
                         for (int i = 0; i < m.cols; i++)
                         {
                             for (int j = 0; j < m.cols; j++)
                             {
-                                // Get cofactor of A[i,j] 
-                                getCofactor(m.data, temp, i, j, m.cols);
+                                cofactors = getCofactor(data, i, j, m.cols);
 
-                                // sign of adj[j,i] positive if sum of row 
-                                // and column indexes is even. 
                                 sign = ((i + j) % 2 == 0) ? 1 : -1;
 
-                                // Interchanging rows and columns to get the 
-                                // transpose of the cofactor matrix 
-                                m.data[j, i] *= sign /** Determinant_fct(temp, m.cols - 1)*/;
+                                double det = Determinant_fct(cofactors, m.cols - 1);
+
+                                m.data[i,j] = sign * det;
                             }
                         }
                         return m;
@@ -237,18 +229,15 @@ namespace Devoir2
         public Matrix Reversed 
         {
             get
-            {
+            {                
                 if (IsSquare)
                 {
-                    Matrix m = Clone();
-                    for (int i = 0; i < rows; i++)
+                    double det = Determinant;
+                    if(det != 0)
                     {
-                        for (int j = 0; j < cols; j++)
-                        {
-                            m.data[i, j] = 1 / m.data[i, j];
-                        }
+                        Matrix m = Clone().CoMatrice.Transpose.scallarProduct(1 / det);
+                        return m;
                     }
-                    return m;
                 }
                 return null;
             }
@@ -281,7 +270,6 @@ namespace Devoir2
                 Console.WriteLine("La matrice est vide");
                 return;
             }
-            Console.WriteLine("Matrice: \n");
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < cols; j++)
@@ -290,6 +278,7 @@ namespace Devoir2
                 }
                 Console.WriteLine();
             }
+            Console.WriteLine('\n');
         }
         public Matrix addition(Matrix p_matrix)
         {
@@ -305,6 +294,13 @@ namespace Devoir2
             }
             return null;
         }
+
+        public Matrix multiply(Matrix p_matrix)
+        {
+            int i = 0;
+            return multiply(p_matrix, ref i);
+        }
+
         public Matrix multiply(Matrix p_matrix, ref int nbProducts)
         {
             if (cols != p_matrix.rows)

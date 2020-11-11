@@ -59,6 +59,7 @@ namespace Devoir2
                 options.Add("Faire produit matriciel");
                 options.Add("Vérifier si une matrice est triangulaire");
                 options.Add("Calculer les propiriétés d'une matrice");
+                options.Add("Résoudre un système d'équation");
                 options.Add("Visualiser les matrices");
                 options.Add("Quitter");
 
@@ -186,7 +187,7 @@ namespace Devoir2
                         if (temp != null)
                             temp.display();
                         else
-                            Console.Write("La matrice n'est pas carrée");
+                            Console.Write("La matrice n'est pas carrée ou a un déterminant de 0");
 
                         string isSquare = m.IsSquare ? "Oui" : "Non";
                         Console.WriteLine("Matrice carrée ? " + isSquare);
@@ -194,17 +195,51 @@ namespace Devoir2
                         Console.WriteLine("Matrice réguliaire ? " + isRegular);
                         break;
                     case 5:
-                        DisplayMatrixes(matrixes);
+                        operationMatrixes = AskForMatrixes(matrixes, 2);
+                        EquationSystem es = new EquationSystem(operationMatrixes[0], operationMatrixes[1]);
+                        bool validated = es.VerifySystem();
+                        if (validated)
+                        {
+                            string initialMessage = "Comment voulez-vous le faire ?";
+
+                            options = new List<string>();
+                            options.Add("Méthode Cramer");
+                            options.Add("Méthode Inversion Matricielle");
+                            options.Add("Méthode Jacobi");
+
+                            selectedOption = OptionSelection(initialMessage, options);
+
+                            Matrix xValues = null;
+                            switch (selectedOption)
+                            {
+                                case 0:
+                                    xValues = es.FindXByCramer();
+                                    break;
+                                case 1:
+                                    xValues = es.FindXByInversion();
+                                    break;
+                                case 2:
+                                    double epsilon = 0;
+                                    xValues = es.FindXByJacobi(epsilon);
+                                    break;
+                            }
+                            if (xValues != null)
+                            {
+                                Console.WriteLine("Valeurs de X : ");
+                                xValues.display();
+                            }
+                        }
                         break;
                     case 6:
+                        DisplayMatrixes(matrixes);
+                        break;
+                    case 7:
                         done = true;
                         break;
                     default:
                         Console.WriteLine("Something Wrong");
                         break;
                 }
-                Console.WriteLine();
-                Console.WriteLine();
             } while (!done);
             Console.ReadLine();
         }
@@ -280,11 +315,15 @@ namespace Devoir2
             bool again = false;
             do
             {
-                Console.WriteLine("Choissisez une matrice :");
+                Console.WriteLine(string.Format("Choissisez la matrice #{0} :",choosen.Count+1));
                 int choosenID = ChooseIntegerOption(matrixes.Count);
                 choosen.Add(matrixes[choosenID]);
 
-                if (max == -1 || choosen.Count != max)
+                if (max != -1)
+                {
+                    again = choosen.Count != max;
+                }
+                else
                 {
                     List<string> options = new List<string>();
                     options.Add("Oui");
