@@ -415,7 +415,7 @@ namespace Devoir2
                 for (int j = 0; j < cols; j++)
                 {
                     Console.Write(string.Format("Donnée [{0},{1}] : ", i, j));
-                    bool ok = false;
+                    bool ok;
 
                     do
                     {
@@ -427,7 +427,7 @@ namespace Devoir2
                         }
                         catch
                         {
-                            throw new Exception("La donnée doit être un chiffre");
+                            Console.WriteLine("La donnée doit être un chiffre");
                             ok = false;
                         }
                     } while (!ok);

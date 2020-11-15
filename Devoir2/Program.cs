@@ -78,7 +78,7 @@ namespace Devoir2
                         break;
                     case 1:                                                                     // Multiplication par scalar
                         Matrix operationMatrix = AskForMatrixes(matrixes, 1)[0];
-                        double scalar = AskForScalar();
+                        double scalar = AskForDouble("Entrez un scalaire");
                         resultMatrix = operationMatrix.scallarProduct(scalar);
                         Console.WriteLine("Matrice résultant de la multiplication avec un scalaire: ");
                         resultMatrix.display();
@@ -219,7 +219,7 @@ namespace Devoir2
                                     xValues = es.FindXByInversion();
                                     break;
                                 case 2:
-                                    double epsilon = 0;
+                                    double epsilon = AskForDouble("Entrez la valeur de l'epsilon");
                                     xValues = es.FindXByJacobi(epsilon);
                                     break;
                             }
@@ -336,12 +336,12 @@ namespace Devoir2
             return choosen;
         }
 
-        private static double AskForScalar()
+        private static double AskForDouble(string message)
         {
             bool ok = false;
             do
             {
-                Console.Write("Entrez un scalaire :");
+                Console.Write(message + " : ");
                 try
                 {
                     return double.Parse(Console.ReadLine());

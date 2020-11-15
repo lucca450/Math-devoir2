@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -114,7 +115,123 @@ namespace Devoir2
 
         public Matrix FindXByJacobi(double epsilon)
         {
-            throw new NotImplementedException();
+            if (VerifyDiagonallyDominant(a))
+            {
+                Matrix d = new Matrix(a.Cols, a.Cols), l = new Matrix(a.Cols, a.Cols), u = new Matrix(a.Cols, a.Cols);
+
+                for(int i =0; i < a.Cols; i++)
+                {
+                    for(int j = 0; j< a.Cols; j++)
+                    {
+                        if (i == j)
+                            d.Data[i, j] = a.Data[i, j];
+                        else if (j < i)
+                            l.Data[i, j] = a.Data[i, j];
+                        else
+                            u.Data[i, j] = a.Data[i, j];
+                    }
+                }
+
+                Matrix lNu = l.addition(u);
+
+                List<string> equations = BuildLinearEquations(d, lNu.scallarProduct(-1), b);
+                Matrix exxes = FindXValuesFromEquations(equations, b.Rows);
+
+
+                int k = 0;
+
+
+            }
+            return null;
+        }
+
+        private Matrix FindXValuesFromEquations(List<string> equations, int nbRows)
+        {
+            Matrix exxes = new Matrix(nbRows, 1);
+
+            return FindXValuesFromEquations(equations, exxes);
+        }
+        private Matrix FindXValuesFromEquations(List<string> equations, Matrix exxes)
+        {
+
+            Matrix newExxes = new Matrix(exxes.Rows, exxes.Cols + 1);
+            for(int i = 0; i< exxes.Rows;i++)
+            {
+                char var = 'a';
+                string equation = equations[i];
+                for (int j = 0; j < exxes.Rows; j++)
+                {
+                    equation = equation.Replace(var.ToString(), "*" + exxes.Data[i,0].ToString());
+                    var++;
+                }
+
+                DataTable dt = new DataTable();
+                double result = (double)dt.Compute(equation, "");
+
+                newExxes.Data[i, exxes.Cols] = result;
+            }
+
+            for(int i = 0;i<exxes.Cols;i++)
+            {
+                for (int j = 0; j < exxes.Cols; j++)
+                {
+                    newExxes.Data[i, j] = exxes.Data[i, j];
+                }
+            }
+
+
+            bool differenceIsOk = false;
+
+
+
+
+            return exxes;
+        }
+
+        private List<string> BuildLinearEquations(Matrix d, Matrix m, Matrix b)
+        {
+            char var;
+            char var2 = 'a';
+            List<string> equations = new List<string>();
+            for(int i = 0;i < m.Cols; i++)
+            {
+                var = 'a';
+                string equation = "1/" + d.Data[i, i] + '*' + '(' + b.Data[i,0].ToString() + "+";
+                for(int j = 0; j < m.Cols; j++)
+                {
+                    if(m.Data[i,j] != 0)
+                    {
+                        equation += m.Data[i, j] + var.ToString() + "+";
+                    }
+                    var++;
+                }
+
+                equation = equation.Remove(equation.Length - 1) + ')';
+
+                equations.Add(equation);
+                var2++;
+            }
+            return equations;
+        }
+
+        private bool VerifyDiagonallyDominant(Matrix m)
+        {
+            for(int i = 0; i< m.Cols; i++)
+            {
+                double diagonalValue = 0;
+                double otherValues = 0;
+                for(int j = 0; j< m.Cols; j++)
+                {
+                    if (i == j)
+                        diagonalValue = Math.Abs(m.Data[i, j]);
+                    else
+                        otherValues += Math.Abs(m.Data[i, j]);
+                }
+
+                if (diagonalValue < otherValues)
+                    return false;
+            }
+            return true;
         }
     }
 }
