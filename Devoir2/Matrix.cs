@@ -263,20 +263,27 @@ namespace Devoir2
         }
 
 
-        public void display()
+        public void display(bool displayExxes = false)
         {
             if (rows == 0 && cols == 0 || rows == 0 && cols == 1)
             {
                 Console.WriteLine("La matrice est vide");
                 return;
             }
+            char var = 'a';
             for (int i = 0; i < rows; i++)
             {
+                string ex = "";
+                if (displayExxes)
+                {
+                    ex = var.ToString() + " : ";
+                }
                 for (int j = 0; j < cols; j++)
                 {
-                    Console.Write(data[i, j] + "\t");
+                    Console.Write(ex + data[i, j] + "\t");
                 }
                 Console.WriteLine();
+                var++;
             }
             Console.WriteLine('\n');
         }
@@ -414,11 +421,11 @@ namespace Devoir2
             {
                 for (int j = 0; j < cols; j++)
                 {
-                    Console.Write(string.Format("Donnée [{0},{1}] : ", i, j));
                     bool ok;
 
                     do
                     {
+                        Console.Write(string.Format("Donnée [{0},{1}] : ", i, j));
                         try
                         {
                             double value = double.Parse(Console.ReadLine());

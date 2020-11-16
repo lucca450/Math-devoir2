@@ -11,7 +11,7 @@ namespace Devoir2
     {
         private Matrix a;
         private Matrix b;
-
+        private List<string> equations = new List<string>();
         private int nbEquation;
 
         public Matrix A
@@ -134,65 +134,86 @@ namespace Devoir2
 
                 Matrix lNu = l.addition(u);
 
-                List<string> equations = BuildLinearEquations(d, lNu.scallarProduct(-1), b);
-                Matrix exxes = FindXValuesFromEquations(equations, b.Rows);
-
-
-                int k = 0;
-
-
+                BuildLinearEquations(d, lNu.scallarProduct(-1), b);
+                Matrix exxes = FindXValuesFromEquations(b.Rows, epsilon);
+                return exxes;
             }
+            Console.WriteLine("La matrice A n'est pas dominante diagolale stricte.");
             return null;
         }
 
-        private Matrix FindXValuesFromEquations(List<string> equations, int nbRows)
+        private Matrix FindXValuesFromEquations(int nbRows, double epsilon)
         {
-            Matrix exxes = new Matrix(nbRows, 1);
+            Matrix exxes = new Matrix(nbRows, 2);
 
-            return FindXValuesFromEquations(equations, exxes);
+            return FindXValuesFromEquations(exxes, epsilon, true);
         }
-        private Matrix FindXValuesFromEquations(List<string> equations, Matrix exxes)
+        private Matrix FindXValuesFromEquations(Matrix exxes, double epsilon, bool firstTime = false)
         {
-
-            Matrix newExxes = new Matrix(exxes.Rows, exxes.Cols + 1);
             for(int i = 0; i< exxes.Rows;i++)
             {
                 char var = 'a';
                 string equation = equations[i];
                 for (int j = 0; j < exxes.Rows; j++)
                 {
-                    equation = equation.Replace(var.ToString(), "*" + exxes.Data[i,0].ToString());
+                    equation = equation.Replace(var.ToString(), "*" + exxes.Data[j,0].ToString());
                     var++;
                 }
 
                 DataTable dt = new DataTable();
                 double result = (double)dt.Compute(equation, "");
 
-                newExxes.Data[i, exxes.Cols] = result;
+                exxes.Data[i, 1] = result;
             }
 
-            for(int i = 0;i<exxes.Cols;i++)
+            if (firstTime)
             {
-                for (int j = 0; j < exxes.Cols; j++)
+                return FindXValuesFromEquations(MoveExxes(exxes), epsilon);
+            }
+            else
+            {
+                bool differenceIsOk = true;
+
+                for(int i = 0; i < exxes.Rows; i++)
                 {
-                    newExxes.Data[i, j] = exxes.Data[i, j];
+                    double diff = Math.Abs(exxes.Data[i, 1] - exxes.Data[i, 0]);
+                    if (diff > epsilon)
+                    {
+                        differenceIsOk = false;
+                        break;
+                    }
+                }
+
+                if (!differenceIsOk)
+                {
+                    return FindXValuesFromEquations(MoveExxes(exxes), epsilon);
+                }
+                else
+                {
+                    Matrix m = new Matrix(exxes.Rows, 1);
+                    for(int i = 0;i < exxes.Rows; i++)
+                    {
+                        m.Data[i, 0] = exxes.Data[i, 1];    
+                    }
+                    return m;
                 }
             }
+        }
 
-
-            bool differenceIsOk = false;
-
-
-
-
+        private Matrix MoveExxes(Matrix exxes)
+        {
+            for(int i = 0; i < exxes.Rows; i++)
+            {
+                exxes.Data[i, 0] = exxes.Data[i, 1];
+            }
             return exxes;
         }
 
-        private List<string> BuildLinearEquations(Matrix d, Matrix m, Matrix b)
+        private void BuildLinearEquations(Matrix d, Matrix m, Matrix b)
         {
             char var;
             char var2 = 'a';
-            List<string> equations = new List<string>();
+            equations = new List<string>();
             for(int i = 0;i < m.Cols; i++)
             {
                 var = 'a';
@@ -211,7 +232,28 @@ namespace Devoir2
                 equations.Add(equation);
                 var2++;
             }
-            return equations;
+        }
+
+        public override string ToString()
+        {
+            string str = "";
+            char var;
+            for (int i = 0; i < a.Rows; i++)
+            {
+                var = 'a';
+                for(int j = 0;j<a.Cols; j++)
+                {
+                    if(a.Data[i,j] != 0)
+                    {
+                        str += a.Data[i, j] + var.ToString() + " + ";
+                    }
+
+                    var++;
+                }
+                str = str.Remove(str.Length - 3).Replace("+-", "-") + " = " + b.Data[i,0] + '\n';
+            }
+
+            return str;
         }
 
         private bool VerifyDiagonallyDominant(Matrix m)

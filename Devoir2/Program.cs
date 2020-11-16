@@ -225,8 +225,10 @@ namespace Devoir2
                             }
                             if (xValues != null)
                             {
-                                Console.WriteLine("Valeurs de X : ");
-                                xValues.display();
+                                Console.WriteLine("Les équations étaient : (x1 = a, x2 = b, x3 = c ...)");
+                                Console.WriteLine(es.ToString());
+                                Console.WriteLine("Valeurs des X : (x1 = a, x2 = b, x3 = c ...)");
+                                xValues.display(true);
                             }
                         }
                         break;
