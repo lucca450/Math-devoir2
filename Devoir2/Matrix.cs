@@ -331,22 +331,28 @@ namespace Devoir2
         }
         public Matrix MultiplyMultipleMatrixes(List<Matrix> matrixes, ref int nbProducts)
         {
-            Matrix result = new Matrix(this);
+            Matrix result = Clone();
+            bool workedOnce = false;
 
-            int i = 0;
+            int i = 2;
             foreach(Matrix m in matrixes)
             {
                 if(result.cols == m.rows)
                 {
+                    workedOnce = true;
                     result = result.multiply(m, ref nbProducts);
                 }
                 else
                 {
-                    Console.WriteLine(string.Format("La matrice #{0} a été exclue du calcul, car son nombre de colonne doit etre égal au nombre de ligne de la premiere matrice.",i));
+                    Console.WriteLine(string.Format("La matrice #{0} a été exclue du calcul, car son nombre de colonne doit etre égal au nombre de ligne de la premiere matrice ou du dernier résultat.",i));
                 }
                 i++;
             }
-            return result;
+
+            if (workedOnce)
+                return result;
+            else
+                return null;
         }
         public Matrix scallarProduct(double p_nbr)
         {
@@ -364,11 +370,11 @@ namespace Devoir2
         }
         public bool VerifyTriangular(int option, int option2)
         {
-            bool upper = false, s_upper = false, lower = false, s_lower = false;
+            bool upper = true, s_upper = true, lower = true, s_lower = true;
 
             if (option == 0 || option == 2)                                     // Supérieur
             {
-                for (int i = 1; i < cols; i++)
+                for (int i = 0; i < cols; i++)
                 {
                     if (data[i, i] != 0)
                         s_upper = false;
@@ -381,10 +387,13 @@ namespace Devoir2
                         }
                     if (!upper) break;
                 }
-                if (option2 == 0)                                   // Stricte
-                    return s_upper;
-                else
-                    return upper;
+                if(option != 2)
+                {
+                    if (option2 == 0)                                   // Stricte
+                        return s_upper;
+                    else
+                        return upper;
+                }
             }
 
             if(option == 1 || option == 2)                                     // Inférieur
@@ -402,15 +411,21 @@ namespace Devoir2
                         }
                     if (!lower) break;
                 }
-                if (option2 == 0)                                   // Stricte                         
-                    return s_lower;
-                else
-                    return lower;
+                if (option != 2)
+                {
+                    if (option2 == 0)                                   // Stricte                         
+                        return s_lower;
+                    else
+                        return lower;
+                }
             }
 
             if(option == 2)                                     // Peu importe
             {
-                return s_upper || s_lower;
+                if (option2 == 0)
+                    return s_upper || s_lower;
+                else
+                    return upper || lower;
             }
             return new bool();
         }

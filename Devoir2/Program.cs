@@ -25,13 +25,13 @@ namespace Devoir2
             do
             {
                 Console.WriteLine("Matrice " + (matrixes.Count + 1) + " :");
-                Console.Write("Nombre de colonnes : ");
+                Console.Write("Nombre de lignes : ");
                 int nbCol, nbRow;
                 try
                 {
-                    nbCol = int.Parse(Console.ReadLine());
-                    Console.Write("Nombre de lignes : ");
                     nbRow = int.Parse(Console.ReadLine());
+                    Console.Write("Nombre de colonnes : ");
+                    nbCol = int.Parse(Console.ReadLine());
 
                     Matrix newMatrix = new Matrix(nbRow, nbCol);
 
@@ -72,9 +72,16 @@ namespace Devoir2
                     case 0:                                                                     // Additions
                         operationMatrixes = AskForMatrixes(matrixes, 2);
                         resultMatrix = operationMatrixes[0].addition(operationMatrixes[1]);
-                        Console.WriteLine("Matrice résultant de l'addition: ");
-                        resultMatrix.display();
-                        matrixes.Add(resultMatrix);
+                        if(resultMatrix != null)
+                        {
+                            Console.WriteLine("Matrice résultant de l'addition: ");
+                            resultMatrix.display();
+                            matrixes.Add(resultMatrix);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Les 2 matrices ne peuvent pas s'additionner");
+                        }
                         break;
                     case 1:                                                                     // Multiplication par scalar
                         Matrix operationMatrix = AskForMatrixes(matrixes, 1)[0];
@@ -85,14 +92,19 @@ namespace Devoir2
                         matrixes.Add(resultMatrix);
                         break;
                     case 2:                                                                     // Multiplication de matrices
-                        operationMatrixes = AskForMatrixes(matrixes);;
-                        operationMatrix = new Matrix(operationMatrixes[0]);
+                        operationMatrixes = AskForMatrixes(matrixes);
+                        operationMatrix = operationMatrixes[0].Clone();
                         operationMatrixes.RemoveAt(0);
                         int nbProducts = 0;
-                        resultMatrix = operationMatrix.MultiplyMultipleMatrixes(operationMatrixes, ref nbProducts);             // à Faire quand vincent est là
-                        resultMatrix.display();
-                        Console.WriteLine(string.Format("Opération effectuée avec {0} produits.", nbProducts));
-                        matrixes.Add(resultMatrix);
+                        resultMatrix = operationMatrix.MultiplyMultipleMatrixes(operationMatrixes, ref nbProducts);
+                        if (resultMatrix != null)
+                        {
+                            resultMatrix.display();
+                            Console.WriteLine(string.Format("Opération effectuée avec {0} produits.", nbProducts));
+                            matrixes.Add(resultMatrix);
+                        }
+                        else
+                            Console.WriteLine("Aucune multiplication n'a été faite");
                         break;
                     case 3:                                                                     // Triangularité
                         Matrix m = AskForMatrixes(matrixes, 1)[0];
@@ -243,7 +255,6 @@ namespace Devoir2
                         break;
                 }
             } while (!done);
-            Console.ReadLine();
         }
 
         private static int OptionSelection(string initialMessage, List<string> options)

@@ -250,7 +250,8 @@ namespace Devoir2
 
                     var++;
                 }
-                str = str.Remove(str.Length - 3).Replace("+-", "-") + " = " + b.Data[i,0] + '\n';
+                if(str != "")
+                    str = str.Remove(str.Length - 3).Replace("+-", "-") + " = " + b.Data[i,0] + '\n';
             }
 
             return str;
